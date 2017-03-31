@@ -21,7 +21,16 @@ def normalize_tweet(text, lowercase=False, rm_digits=False, return_tokens=False)
     clean = ' '.join(tokens)
     if rm_digits:
         re.sub(NUM_PATTERN, 'NUM', clean)
-    return clean
+
+    cleanMapping = []
+
+    for token in tokens:
+        for x in token:
+            cleanMapping.append(token)
+        cleanMapping.append(' ')
+    cleanMapping.pop()
+
+    return (clean, cleanMapping)
 
 
 def split_data(tweets, train_portion=0.8):

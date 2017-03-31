@@ -1,5 +1,6 @@
 from Tweet import *
 from util import normalize_tweet
+from util.sentic_grabber import getSentics
 import copy
 from collections import defaultdict
 import cPickle
@@ -52,9 +53,10 @@ class Line(object):
 def charify(line):
     text = line.txt
     if text is not None:
-        chars = list(normalize_tweet(text))
+        prechars, mapping = normalize_tweet(text)
+        chars = list(prechars)
         line.chars = chars
-        return chars
+        return chars, mapping
     else:
         return None
 
@@ -91,7 +93,7 @@ def process(filename, dictionary=None, ascii=False):
     processed_lines = []
     count = 0
     for line in lines:
-        chars = charify(line)
+        chars, mapping = charify(line)
         if chars is not None:
             processed_lines.append(line)
             if make_dict:
@@ -102,10 +104,10 @@ def process(filename, dictionary=None, ascii=False):
             ncomplete += 1
         if (ncomplete % 10000) == 0:
             print('%d / %d' % (ncomplete, nlines))
-    return processed_lines, dictionary
+    return processed_lines, dictionary, mapping
 
 
-def write(outfile, lines, dictionary, write_dict=False, label_map=None, ascii=False):
+def write(outfile, lines, dictionary, mapping, write_dict=False, label_map=None, ascii=False):
     print('writing %s' % outfile)
     if write_dict:
         dict_filename = '%s.vocab.pkl' % outfile
@@ -127,10 +129,13 @@ def write(outfile, lines, dictionary, write_dict=False, label_map=None, ascii=Fa
             nskips += 1
         else:
             ints = []
-            for c in line.chars:
+            sentics = []
+            for c,word in zip(line.chars, mapping):
                 if c in dictionary:
                     ints.append(str(dictionary[c]))
+                    sentics.append(str(getSentics(word)))
             text = ' '.join(ints)
+            senticText = '|'.join(sentics)
             if line.label not in label_map:
                 assert int(line.label) in int2label, 'bad label? %s' % line.label
                 label_str = int2label[int(line.label)]
@@ -141,7 +146,7 @@ def write(outfile, lines, dictionary, write_dict=False, label_map=None, ascii=Fa
                 npos += 1
             else:
                 nneg += 1
-            outline = '%s\t%s\n' % (str(label), text)
+            outline = '%s\t%s\t%s\n' % (str(label), text, senticText)
             outf.write(outline)
     print('skipped %d lines' % nskips)
     print 'npos: %d, nneg: %d' % (npos, nneg)

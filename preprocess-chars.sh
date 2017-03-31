@@ -14,7 +14,7 @@ if [ -z $1 ]
 then
 echo "PROCESS SEMEVAL"
 root="$PWD"
-dataRoot="/home/kate/F15/semeval16/data/subtask-A"
+dataRoot="/home/arya_b/Desktop/personal_projects/TobiTwitter/semeval16/data/subtask-A"
 outDir="$root/CHAR_DATA/semeval"
 mkdir -pv $outDir
 trainfile="$dataRoot/train.tsv"
