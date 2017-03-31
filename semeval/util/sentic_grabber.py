@@ -18,7 +18,11 @@ def getSentics(wd):
     concept_info = -1
     try:
         concept_info = sn.sentics(wd)
-        return concept_info
+        return sentics2Tuple(concept_info)
     except KeyError:
-        concept_info = json.dumps({'polarity_value': 'nuetral', 'polarity_intense': '0', 'moodtags': [], 'sentics': {'pleasantness': '0', 'attention': '0', 'sensitivity': '0', 'aptitude': '0'}, 'semantics': []})
+        concept_info = {
+            'pleasantness': '0',
+            'attention': '0',
+            'sensitivity': '0',
+            'aptitude': '0'}
     return sentics2Tuple(concept_info)

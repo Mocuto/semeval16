@@ -156,16 +156,16 @@ def main(args):
     filename = args.tweet_file
     label_map = cPickle.load(open(args.label_map, 'r'))
     print(label_map)
-    lines, dictionary = process(filename, ascii=args.ascii)
+    lines, dictionary, mapping = process(filename, ascii=args.ascii)
     print('dict:')
     print(dictionary)
     outfile = args.output_file
-    write(outfile, lines, dictionary, write_dict=True, label_map=label_map, ascii=args.ascii)
+    write(outfile, lines, dictionary, mapping, write_dict=True, label_map=label_map, ascii=args.ascii)
     if args.test_file:
         testfile = args.test_file
         print('processing test file %s' % testfile)
-        lines, _ = process(testfile, dictionary=dictionary, ascii=args.ascii)
-        write(outfile + '.test', lines, dictionary, write_dict=False, label_map=label_map, ascii=args.ascii)
+        lines, _, _ = process(testfile, dictionary=dictionary, ascii=args.ascii)
+        write(outfile + '.test', lines, dictionary, mapping, write_dict=False, label_map=label_map, ascii=args.ascii)
     print('done')
 
 
@@ -210,10 +210,12 @@ def preprocess_semeval(infile, outfile, vocab=None, label_dict=None):
         mk_vocab = True
         vocab = defaultdict(int)
     ntexts = []
+    nSentics = []
     ct = 0
     for text in texts:
-        ntext = normalize_tweet(text)
+        ntext, mapping = normalize_tweet(text)
         ntexts.append(ntext)
+        nSentics = [getSentics(word) for word in mapping]
         if mk_vocab:
             chars = list(ntext)
             for c in chars:
@@ -226,8 +228,9 @@ def preprocess_semeval(infile, outfile, vocab=None, label_dict=None):
     for i, text in enumerate(ntexts):
         ints = map(lambda c: vocab[c], text)
         ints_str = ' '.join([str(c) for c in ints])
+        sentics_str = '|'.join([str(tup) for tup in nSentics])
         label = str(label_ints[i])
-        line = label + "\t" + ints_str
+        line = label + "\t" + ints_str + "\t" + sentics_str
         lines.append(line)
 
     if mk_vocab:

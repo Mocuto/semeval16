@@ -422,7 +422,7 @@ def load_dataset(trainfile, testfile, vocabfile, devfile=None, rng=None, pad_wit
                 if len(parts) != 2:
                     nerrs += 1
                     continue
-                y, x = parts[0], parts[1]
+                y, charInts, sentics = parts[0], parts[1], parts[2]
                 if len(x) == 0:
                     nerrs += 1
                     continue
