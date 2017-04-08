@@ -23,7 +23,7 @@ def normalize_tweet(text, lowercase=False, rm_digits=False, return_tokens=False)
         re.sub(NUM_PATTERN, 'NUM', clean)
 
     cleanMapping = []
-
+    # print("In token")
     for token in tokens:
         for x in token:
             cleanMapping.append(token)

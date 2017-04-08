@@ -22,6 +22,7 @@ PATTERNS = {
 
 class Line(object):
     def __init__(self, raw, line_no):
+        # print("In Line",raw)
         parts = raw.split(',')
         self.line_no = line_no
         self.tid = None
@@ -29,22 +30,30 @@ class Line(object):
         self.chars = None
         self.label = None
         self.error = False
-        if len(parts) != 6:
-            bad_parts = parts[5:]
+        if len(parts) < 2:
+            bad_parts = parts[1:]
             new_str = ', '.join(bad_parts)
-            parts = parts[:5] + [new_str]
-        if len(parts) != 6:
-            print('parsing: bad line @ %d (parts len = %d): %s' % (self.line_no, len(parts), raw))
+            parts = parts[:1] + [new_str]
+        if len(parts) < 2 :
+            # print('parsing: bad line @ %d (parts len = %d): %s' % (self.line_no, len(parts), raw))
             # print(parts)
             self.error = True
         else:
-            self.tid = parts[1].strip('"')
-            self.txt = parts[5].strip('"')
-            self.label = int(parts[0].strip('"'))
+            # print(parts, len(parts))
+            self.tid = int(parts[0].split("\t")[0])
+            # print("tid is ",self.tid)
+            self.txt = parts[0].split('\t')[2]
+            # print("txt is ", self.txt)
+            # print("o is ",ss.split("\t")[0])
+            if parts[0].split("\t")[1] == u"negative":
+                self.label = 0
+            else:
+                self.label = 4
         self.tokens = None
 
     def __repr__(self):
         if self.txt is not None:
+            # print("we re here --------------------------------------")
             return 'Line(%s)' % self.txt
         else:
             return 'Line(ERROR)'
@@ -52,6 +61,7 @@ class Line(object):
 
 def charify(line):
     text = line.txt
+    # print("text is ",text)
     if text is not None:
         prechars, mapping = normalize_tweet(text)
         chars = list(prechars)
@@ -62,19 +72,21 @@ def charify(line):
 
 
 def process(filename, dictionary=None, ascii=False):
-    print('processing %s' % filename)
+    # print('processing %s' % filename)
+    # print('BARDWAJJJJJJJJJJJJJJ')
     unicode_errors = 0
     parse_errors = 0
     lines = []
     count = 0
     mode = 'utf-8'
     if ascii:
+        print("Mode is Ascii", ascii)
         mode = 'ascii'
     with codecs.open(filename, 'rU', mode, 'ignore') as f:
         for line in f:
-            parsed = Line(line.rstrip('\n'), count)
+            parsed=Line(line.rstrip('\n'),count)
             if parsed.error:
-                parse_errors += 1
+                parse_errors+= 1
             else:
                 lines.append(parsed)
             count += 1
@@ -111,12 +123,14 @@ def write(outfile, lines, dictionary, mapping, write_dict=False, label_map=None,
     print('writing %s' % outfile)
     if write_dict:
         dict_filename = '%s.vocab.pkl' % outfile
-        print('writing dictionary to %s' % dict_filename)
+        # print('writing dictionary to %s' % dict_filename)
         cPickle.dump(dictionary, open(dict_filename, 'w'))
     mode = 'utf-8'
+    print("Mode is Ascii", ascii)
     if ascii:
+        print("Mode is Ascii", ascii)
         mode = 'ascii'
-    outf = codecs.open(outfile, 'w+', mode)
+    outf = codecs.open(outfile, 'wU', mode, 'ignore', buffering=-1)
     assert label_map is not None
     int2label = {0: "negative", 2: "neutral", 4: "positive"}
     npos = 0
@@ -149,10 +163,11 @@ def write(outfile, lines, dictionary, mapping, write_dict=False, label_map=None,
             outline = '%s\t%s\t%s\n' % (str(label), text, senticText)
             outf.write(outline)
     print('skipped %d lines' % nskips)
-    print 'npos: %d, nneg: %d' % (npos, nneg)
+    print('npos: %d, nneg: %d' % (npos, nneg))
 
 
 def main(args):
+    print("This is main file 2")
     filename = args.tweet_file
     label_map = cPickle.load(open(args.label_map, 'r'))
     print(label_map)
@@ -170,6 +185,7 @@ def main(args):
 
 
 def main_semeval(args):
+    print("This is main file")
     trainfile = args.tweet_file
     label_map = cPickle.load(open(args.label_map, 'r'))
 
@@ -196,7 +212,7 @@ def main_semeval(args):
 def preprocess_semeval(infile, outfile, vocab=None, label_dict=None):
     tweets = load_from_tsv(infile, subtask_id='a')
     tweets = filter(lambda t: t.label != 'neutral', tweets)
-    print('loaded %d tweets from %s' % (len(tweets), infile))
+    # print('loaded %d tweets from %s' % (len(tweets), infile))
     texts = map(lambda t: t.raw_text, tweets)
     labels = map(lambda t: t.label, tweets)
     mk_label_map = False
@@ -222,8 +238,7 @@ def preprocess_semeval(infile, outfile, vocab=None, label_dict=None):
                 if c not in vocab:
                     vocab[c] = ct
                     ct += 1
-    print(vocab)
-    print
+    # print("Baradwaj vocab check", vocab)
     lines = []
     for i, text in enumerate(ntexts):
         ints = map(lambda c: vocab[c], text)
@@ -232,17 +247,18 @@ def preprocess_semeval(infile, outfile, vocab=None, label_dict=None):
         label = str(label_ints[i])
         line = label + "\t" + ints_str + "\t" + sentics_str
         lines.append(line)
-
+    # print("Baradwaj my_vocab value",mk_vocab)
     if mk_vocab:
+
         vocab_filename = '%s.vocab.pkl' % outfile
-        print('writing vocab to %s' % vocab_filename)
+        # print('writing vocab to %s' % vocab_filename)
         cPickle.dump(vocab, open(vocab_filename, 'w'))
     if mk_label_map:
         label_filename = '%s.labels.pkl' % outfile
-        print('writing label map to %s' % label_filename)
+        # print('writing label map to %s' % label_filename)
         cPickle.dump(label_dict, open(label_filename, 'w'))
 
-    print('writing output to %s' % outfile)
+    # print('writing output to %s' % outfile)
     with open(outfile, 'w') as f:
         for line in lines:
             f.write(line + '\n')
@@ -266,7 +282,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     print("ARGS:")
-    print(args)
+    print(args.output_file)
     if args.semeval:
         main_semeval(args)
     else:

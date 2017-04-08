@@ -14,8 +14,9 @@ if [ -z $1 ]
 then
 echo "PROCESS SEMEVAL"
 root="$PWD"
-dataRoot="/home/arya_b/Desktop/personal_projects/TobiTwitter/semeval16/data/subtask-A"
+dataRoot="/Users/aryan/Desktop/personal_projects/semeval16/data/subtask-A"
 outDir="$root/CHAR_DATA/semeval"
+outputFile="$root/CHAR_DATA/output.txt"
 mkdir -pv $outDir
 trainfile="$dataRoot/train.tsv"
 devfile="$dataRoot/dev.tsv"
@@ -26,13 +27,14 @@ checkfile $vocab
 checkfile $labelMap
 checkdir $outDir
 python semeval/preprocess_chars.py \
---semeval "true" \
+--output-file $outputFile \
 --output-dir $outDir \
 --tweet-file $trainfile \
 --test-file $testfile \
 --dev-file $devfile \
 --label-map $labelMap \
 #--vocab-file $vocab
+#--semeval "false" \
 
 else
 #

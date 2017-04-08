@@ -150,7 +150,7 @@ def build_model(hyparams,
     for lname, lyr in net.items():
         logstr += '%s %s\n' % (lname, str(get_output_shape(lyr, ASSUME)))
     logstr += '=========================== \n'
-    print logstr
+    print(logstr)
     log.write(logstr)
     log.flush()
     return net
@@ -189,7 +189,7 @@ def learn_model(hyparams,
     timestamp = time.strftime('%m%d%Y_%H%M%S')
     log_file = open(log_path + "/training_log_" + timestamp, "w+")
 
-    print "Loading Dataset"
+    print("Loading Dataset")
     train, dev, test, vmap = load_dataset(train_path, test_path, vocab_file, rng=RNG, devfile=val_path)
     y_train, X_train = train
     y_val, X_val = dev
@@ -199,15 +199,15 @@ def learn_model(hyparams,
     pad_char = u'♥'
     vmap[pad_char] = 0
 
-    print "Training size", X_train.shape[0]
-    print "Validation size", X_val.shape[0]
-    print "Test size", X_test.shape[0]
+    print("Training size", X_train.shape[0])
+    print("Validation size", X_val.shape[0])
+    print("Test size", X_test.shape[0])
 
     V = len(vmap)
     n_classes = len(set(y_train))
-    print "Vocab size:", V
-    print "Number of classes", n_classes
-    print "Classes", set(y_train)
+    print("Vocab size:", V)
+    print("Number of classes", n_classes)
+    print("Classes", set(y_train))
 
     log_file.write('ntrain: %d\nnval: %d\nntest: %d\nnclasses: %d\nvocab size: %d\nbatchsize: %d\n' %
                    (X_train.shape[0], X_val.shape[0], X_test.shape[0], n_classes, V, hyparams.batchsize))
@@ -221,7 +221,7 @@ def learn_model(hyparams,
     log_file.flush()
 
     # Construct network
-    print "Building Model"
+    print("Building Model")
     network = build_model(hyparams, vmap, log_file, n_classes, invar=X, maskvar=M)
 
     if model_file is not None:
@@ -250,7 +250,7 @@ def learn_model(hyparams,
         raise Exception('unsupported optimizer: %s' % optim)
 
     # Compile train objective
-    print "Compiling training functions"
+    print("Compiling training functions")
     train = theano.function([X, M, y], cost,
                             updates=grad_updates,
                             allow_input_downcast=True)
@@ -293,10 +293,10 @@ def learn_model(hyparams,
 
         return val_loss, val_acc
 
-    print "Starting Training"
+    print("Starting Training")
     nbatches = X_train.shape[0] / batchsize
     valfreq = max(int(nbatches / 8.), 2)  # evaluate every [valfreq] minibatches
-    print 'validating every', valfreq, 'batches'
+    print('validating every', valfreq, 'batches')
 
     begin_time = time.time()
     best_val_acc = -np.inf
@@ -311,7 +311,7 @@ def learn_model(hyparams,
             # print x_train.shape, y_train.shape
             train_err += train(x_mini[:, :, 0], x_mini[:, :, 1], y_mini)
             train_batches += 1
-            print '[epoch %d batch %d/%d]' % (epoch, train_batches, nbatches)
+            print('[epoch %d batch %d/%d]' % (epoch, train_batches, nbatches))
             # print "Batch {} : cost {:.6f}".format(
             #     train_batches, train_err / train_batches)
 
@@ -325,7 +325,7 @@ def learn_model(hyparams,
 
                 if val_acc >= best_val_acc:
                     best_val_acc = val_acc
-                    print '\t%f' % best_val_acc
+                    print('\t%f' % best_val_acc)
                     write_model_data(network, log_path + '/best_lstm_model')
 
                 log_file.write(
@@ -339,7 +339,7 @@ def learn_model(hyparams,
 
         disp_msg = "Epoch {} of {} took {:.3f}s\n".format(
             epoch + 1, num_epochs, time.time() - start_time)
-        print disp_msg
+        print(disp_msg)
         log_file.write(disp_msg)
         log_file.write("\t  training loss:\t\t{:.6f}\n".format(
             train_err / train_batches))
@@ -432,7 +432,7 @@ def load_dataset(trainfile, testfile, vocabfile, devfile=None, rng=None, pad_wit
                 x = map(lambda i: i + 1, x)
                 Y.append(y)
                 X.append(x)
-        print 'bad lines: ', nerrs
+        print('bad lines: ', nerrs)
         return np.asarray(Y, dtype=np.int32), pad_mask(X, pad_with=pad_with)
     vocab = cPickle.load(open(vocabfile, 'r'))
     vocab_shift = {}
@@ -477,7 +477,7 @@ def test_model(model_path,
     log_file = open(output_file, 'w+')
     log_file.write('%s\n' % timestamp)
 
-    print "Loading Dataset"
+    print("Loading Dataset")
     _, dev, test, vmap = load_dataset(train_path, test_path, vocab_file, rng=RNG, devfile=val_path)
     y_val, X_val = dev
     y_test, X_test = test
@@ -497,7 +497,7 @@ def test_model(model_path,
     y = T.ivector('y')
 
     # Construct network
-    print "Building Model"
+    print("Building Model")
     log_file.write('model file: %s\n' % model_path)
     #    network = build_model(hyparams, vmap, log_file, n_classes, invar=X, maskvar=M)
 
@@ -556,7 +556,7 @@ if __name__ == '__main__':
     print(args)
     hyparams = HParams()
     hyparams.parse_args(args)
-    print hyparams
+    print(hyparams)
 
     if args.test_only:
         test_model(args.model_file,

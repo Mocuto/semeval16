@@ -47,8 +47,7 @@ def load_from_tsv(filename, subtask_id='a'):
             errors += 1
         else:
             tweets_clean.append(tweet)
-    print("loaded %d / %d tweets from file %s; %d failed to download properly." %
-          (len(tweets_clean), len(tweets), filename, errors))
+    # print("loaded %d / %d tweets from file %s; %d failed to download properly." % (len(tweets_clean), len(tweets), filename, errors))
     return tweets_clean
 
 
@@ -63,5 +62,6 @@ def load_datasets(args):
         test_portion = int(0.5 * ndev)
         test = dev[:test_portion]
         dev = dev[test_portion:]
+    print("Baradwaj")
     print("ntrain: %d, ndev: %d, ntest: %d" % (len(train), len(dev), len(test)))
     return train, dev, test

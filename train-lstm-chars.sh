@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 root="$PWD"
-dataRoot="/home/kate/F15/CHAR_DATA"
+dataRoot="/Users/aryan/Desktop/personal_projects/semeval16/CHAR_DATA"
 
-infile="$dataRoot/big_ascii/tweets.chars.tsv.small"
-testfile="$dataRoot/big_ascii/tweets.chars.tsv.test"
-vocab="$dataRoot/ascii_vocab.pkl"
+infile="$dataRoot/semeval/train.chars.tsv"
+testfile="$dataRoot/semeval/test.chars.tsv"
+vocab="$dataRoot/semeval/train.chars.tsv.pkl"
 labels="$dataRoot/labels.pkl"
 
 logdir="$root/debug_ascii"
