@@ -373,7 +373,7 @@ def learn_model(hyparams,
 
     log_file.close()
     csv.close()
-
+    fname
     return network
 
 
