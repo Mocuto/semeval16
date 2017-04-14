@@ -32,7 +32,7 @@ python semeval/preprocess_chars.py \
 --test-file $testfile \
 --dev-file $devfile \
 --label-map $labelMap \
-#--vocab-file $vocab
+--vocab-file $vocab
 
 else
 #

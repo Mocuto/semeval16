@@ -209,6 +209,7 @@ def preprocess_semeval(infile, outfile, vocab=None, label_dict=None):
     if vocab is None:
         mk_vocab = True
         vocab = defaultdict(int)
+    else: print "Using preloaded vocab"
     ntexts = []
     nSentics = []
     ct = 0
