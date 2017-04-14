@@ -398,17 +398,19 @@ def pad_mask(X, pad_with=0, maxlen=MAXLEN):
     N = len(X)
     X_out = None
     if pad_with == 0:
-        X_out = np.zeros((N, maxlen, 2), dtype=np.int32)
+        X_out = np.zeros((N, maxlen, 3), dtype=np.int32)
     else:
-        X_out = np.ones((N, maxlen, 2), dtype=np.int32) * pad_with
+        X_out = np.ones((N, maxlen, 3), dtype=np.int32) * pad_with
     for i, x in enumerate(X):
         n = len(x)
         if n < maxlen:
-            X_out[i, :n, 0] = x
+            X_out[i, :n, 0] = x[0]
             X_out[i, :n, 1] = 1
+            X_out[i, :n, 2] = x[1]
         else:
-            X_out[i, :, 0] = x[:maxlen]
+            X_out[i, :, 0] = x[0][:maxlen]
             X_out[i, :, 1] = 1
+            X_out[i, :, 2] = x[1][:maxlen]
     return X_out
 
 
@@ -423,13 +425,15 @@ def load_dataset(trainfile, testfile, vocabfile, devfile=None, rng=None, pad_wit
                     nerrs += 1
                     continue
                 y, charInts, sentics = parts[0], parts[1], parts[2]
-                if len(x) == 0:
+                if len(charInts) == 0:
                     nerrs += 1
                     continue
                 y = int(y)
-                x = map(int, x.split(' '))
+                charInts = map(int, charInts.split(' '))
+                sentics = map(tuple, sentics.split('|'))
                 #  shift up by 1 so padding doesnt perturb input
-                x = map(lambda i: i + 1, x)
+                charInts = map(lambda i: i + 1, charInts)
+                x = [charInts, sentics]
                 Y.append(y)
                 X.append(x)
         print 'bad lines: ', nerrs
