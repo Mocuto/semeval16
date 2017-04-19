@@ -1,0 +1,19 @@
+ntrain: 0
+nval: 0
+ntest: 0
+nclasses: 0
+vocab size: 89
+batchsize: 100
+========== HPARAMS =========
+batchsize: 100
+bidirectional: True
+embedding_dim: 50
+grad_clip: 100
+init: random
+learning_rate: 0.1
+nepochs: 1
+nhidden: 256
+optimizer: adam
+pool: mean
+============================
+

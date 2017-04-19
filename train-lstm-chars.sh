@@ -19,7 +19,7 @@ THEANO_FLAGS=device=cpu,floatX=float32 python $root/semeval/lstm_chars.py \
 --test-file $testfile \
 --batchsize "100" \
 --nepochs "1" \
---model-file "$root/bidir_lstm_ascii" \
+#--model-file "$root/bidir_lstm_ascii" \
 --results-file "$logdir/bidir_ascii_results.txt" \
 --label-file $labels
 

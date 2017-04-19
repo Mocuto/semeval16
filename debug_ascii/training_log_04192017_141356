@@ -1,0 +1,55 @@
+ntrain: 2869
+nval: 717
+ntest: 1172
+nclasses: 2
+vocab size: 89
+batchsize: 100
+========== HPARAMS =========
+batchsize: 100
+bidirectional: True
+embedding_dim: 50
+grad_clip: 100
+init: random
+learning_rate: 0.1
+nepochs: 1
+nhidden: 256
+optimizer: adam
+pool: mean
+============================
+
+========== MODEL ========== 
+vocab size: 89
+embedding dim: 50
+nhidden: 256
+pooling: mean
+input (200, 140)
+mask (200, 140)
+emb (200, 140, 50)
+fwd1 (200, 140, 256)
+bwd1 (200, 140, 256)
+pool (200, 140, 256)
+dropout1 (200, 140, 256)
+fwd2 (200, 256)
+dropout2 (200, 256)
+softmax (200, 2)
+=========================== 
+	Batch 3 of epoch 1 took 32.581s
+	  training loss:		0.686082
+	  validation loss:		0.656972
+	  validation accuracy:		80.43 %
+	Current best validation accuracy:		80.43
+	Batch 6 of epoch 1 took 96.762s
+	  training loss:		0.663294
+	  validation loss:		0.525448
+	  validation accuracy:		80.43 %
+	Current best validation accuracy:		80.43
+	Batch 9 of epoch 1 took 162.921s
+	  training loss:		0.614008
+	  validation loss:		0.499202
+	  validation accuracy:		80.43 %
+	Current best validation accuracy:		80.43
+	Batch 12 of epoch 1 took 228.646s
+	  training loss:		0.597212
+	  validation loss:		0.530566
+	  validation accuracy:		80.43 %
+	Current best validation accuracy:		80.43

@@ -216,7 +216,8 @@ def preprocess_semeval(infile, outfile, vocab=None, label_dict=None):
     for text in texts:
         ntext, mapping = normalize_tweet(text)
         ntexts.append(ntext)
-        nSentics = [getSentics(word) for word in mapping]
+        nSentic = [getSentics(word) for word in mapping]
+        nSentics.append(nSentic)
         if mk_vocab:
             chars = list(ntext)
             for c in chars:
@@ -226,10 +227,10 @@ def preprocess_semeval(infile, outfile, vocab=None, label_dict=None):
     print(vocab)
     print
     lines = []
-    for i, text in enumerate(ntexts):
+    for i, (text, sentic) in enumerate(zip(ntexts, nSentics)):
         ints = map(lambda c: vocab[c], text)
         ints_str = ' '.join([str(c) for c in ints])
-        sentics_str = '|'.join([str(tup) for tup in nSentics])
+        sentics_str = '|'.join([str(tup) for tup in sentic])
         label = str(label_ints[i])
         line = label + "\t" + ints_str + "\t" + sentics_str
         lines.append(line)

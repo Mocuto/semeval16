@@ -137,6 +137,8 @@ def build_model(hyparams,
             only_return_final=True
         )
     net['dropout2'] = layer.DropoutLayer(net['fwd2'], p=0.6)
+    print("nClasses")
+    print(nclasses)
     net['softmax'] = layer.DenseLayer(
         net['dropout2'],
         num_units=nclasses,
@@ -373,7 +375,7 @@ def learn_model(hyparams,
 
     log_file.close()
     csv.close()
-    fname
+    # fname
     return network
 
 
@@ -395,33 +397,48 @@ def write_model_data(model, filename):
 
 
 def pad_mask(X, pad_with=0, maxlen=MAXLEN):
-    N = len(X)
+    N = len(X[0])
     X_out = None
     if pad_with == 0:
-        X_out = np.zeros((N, maxlen, 3), dtype=np.int32)
+        X_out = np.zeros((N, maxlen, 6), dtype=np.int32)
     else:
-        X_out = np.ones((N, maxlen, 3), dtype=np.int32) * pad_with
-    for i, x in enumerate(X):
+        X_out = np.ones((N, maxlen, 6), dtype=np.int32) * pad_with
+    for i, x in enumerate(X[0]):
         n = len(x)
         if n < maxlen:
-            X_out[i, :n, 0] = x[0]
+            X_out[i, :n, 0] = x
             X_out[i, :n, 1] = 1
-            X_out[i, :n, 2] = x[1]
+            #print "X is"
+            #print x
+            #print X[1][i]
+            #print X[0][i]
+            X_out[i, :n, 2] = map(lambda item: item[0], X[1][i])
+            X_out[i, :n, 3] = map(lambda item: item[1], X[1][i])
+            X_out[i, :n, 4] = map(lambda item: item[2], X[1][i])
+            X_out[i, :n, 5] = map(lambda item: item[3], X[1][i])
         else:
-            X_out[i, :, 0] = x[0][:maxlen]
+            X_out[i, :, 0] = x[:maxlen]
             X_out[i, :, 1] = 1
-            X_out[i, :, 2] = x[1][:maxlen]
+            X_out[i, :, 2] = map(lambda item: item[0], X[1][i][:maxlen])#X[1][i][:maxlen][0]
+            X_out[i, :, 3] = map(lambda item: item[1], X[1][i][:maxlen])
+            X_out[i, :, 4] = map(lambda item: item[2], X[1][i][:maxlen])
+            X_out[i, :, 5] = map(lambda item: item[3], X[1][i][:maxlen])
     return X_out
 
 
 def load_dataset(trainfile, testfile, vocabfile, devfile=None, rng=None, pad_with=0):
+
+    def strToTup(str):
+        tokens = map(float, str[2:-2].split("', '"))
+        return tuple(tokens)
+
     def load_file(fname, pad_with=0):
-        X, Y = [], []
+        X, Y = [[], []], []
         nerrs = 0
         with open(fname, 'r') as f:
             for line in f.readlines():
                 parts = line.strip().split('\t')
-                if len(parts) != 2:
+                if len(parts) != 3:
                     nerrs += 1
                     continue
                 y, charInts, sentics = parts[0], parts[1], parts[2]
@@ -430,12 +447,12 @@ def load_dataset(trainfile, testfile, vocabfile, devfile=None, rng=None, pad_wit
                     continue
                 y = int(y)
                 charInts = map(int, charInts.split(' '))
-                sentics = map(tuple, sentics.split('|'))
+                sentics = map(strToTup, sentics.split('|'))
                 #  shift up by 1 so padding doesnt perturb input
                 charInts = map(lambda i: i + 1, charInts)
-                x = [charInts, sentics]
                 Y.append(y)
-                X.append(x)
+                X[0].append(charInts)
+                X[1].append(sentics)
         print 'bad lines: ', nerrs
         return np.asarray(Y, dtype=np.int32), pad_mask(X, pad_with=pad_with)
     vocab = cPickle.load(open(vocabfile, 'r'))
